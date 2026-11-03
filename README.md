@@ -24,6 +24,10 @@ Abrir el HTML generado en un navegador. El documento incluye su CSS y no
 necesita conexión para visualizarse; los enlaces de atribución son referencias.
 
 El CSV debe incluir `imdb`, `title`, `year`, `budget` y `domgross`.
+Cada `imdb` debe ser único y tener el prefijo `tt` seguido de uno o más
+dígitos del 0 al 9 (por ejemplo, `tt1711425`). Se eliminan los espacios de
+los extremos antes de validarlo. Esta regla comprueba el formato localmente,
+sin consultar si el identificador existe en IMDb.
 Las demás columnas se conservan en los registros cargados, pero no intervienen
 en los cálculos ni en la página. `NA` o vacío significan datos faltantes, nunca
 cero. También se admite `#N/A`, presente en la copia original, como faltante.

@@ -20,6 +20,22 @@ def datos(filas):
 
 
 class TestAnalizar(unittest.TestCase):
+    def test_formato_imdb_valido(self):
+        for identificador in ("tt1", "tt1711425", "tt123456789", " tt0000123 "):
+            with self.subTest(imdb=identificador):
+                peliculas = datos(f"{identificador},Uno,2001,10,20\n")
+                self.assertEqual(peliculas[0]["imdb"], identificador.strip())
+
+    def test_rechazo_formato_imdb_invalido(self):
+        for identificador in ("pelicula123", "1234567", "ttABC123", "tt", "TT123",
+                              "tt12-3", "tt12 3", "tt1extra", "tt１２３"):
+            with self.subTest(imdb=identificador):
+                with self.assertRaisesRegex(
+                    analizar.ErrorDatos,
+                    "Fila 3, columna imdb: debe comenzar por 'tt' seguido únicamente de dígitos",
+                ):
+                    datos(f"tt1,Uno,2001,10,20\n{identificador},Dos,2002,20,30\n")
+
     def test_suma_y_media_conocidas(self):
         peliculas = datos("tt1,Uno,2001,10,30\ntt2,Dos,2002,20,50\n")
         resultado = analizar.calcular_estadisticas(peliculas)
@@ -135,6 +151,13 @@ class TestAnalizar(unittest.TestCase):
             with patch.object(analizar, "BASE", base), redirect_stderr(errores):
                 self.assertNotEqual(analizar.main([]), 0)
             self.assertIn("Fila 2, columna domgross", errores.getvalue())
+            self.assertEqual(destino.read_bytes(), anterior)
+
+            csv.write_text(CABECERA + "pelicula123,Uno,2001,10,20\n", encoding="utf-8")
+            errores = io.StringIO()
+            with patch.object(analizar, "BASE", base), redirect_stderr(errores):
+                self.assertNotEqual(analizar.main([]), 0)
+            self.assertIn("Fila 2, columna imdb", errores.getvalue())
             self.assertEqual(destino.read_bytes(), anterior)
 
 

@@ -67,6 +67,8 @@ def validar_csv(fuente):
             identificador = registro["imdb"].strip()
             if not identificador:
                 error(fila, "imdb", "el identificador está vacío")
+            if not re.fullmatch(r"tt[0-9]+", identificador):
+                error(fila, "imdb", "debe comenzar por 'tt' seguido únicamente de dígitos")
             if identificador in identificadores:
                 error(fila, "imdb", "el identificador está duplicado")
             identificadores.add(identificador)
