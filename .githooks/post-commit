@@ -1,0 +1,18 @@
+#!/bin/sh
+# Enviar automaticamente los commits de main en este repositorio educativo.
+# El commit ya existe: un fallo de red no debe presentarse como fallo del commit.
+
+rama=$(git symbolic-ref --quiet --short HEAD) || exit 0
+[ "$rama" = "main" ] || exit 0
+
+registro=$(git rev-parse --git-path auto-push.log) || exit 0
+export GIT_TERMINAL_PROMPT=0
+export GCM_INTERACTIVE=Never
+
+if git -c credential.interactive=never push origin HEAD:refs/heads/main >"$registro" 2>&1; then
+    printf '%s\n' 'Envio automatico completado: origin/main.'
+else
+    printf '%s\n' 'Commit guardado. No se pudo enviar automaticamente.' >&2
+    printf '%s\n' "Revisa $registro y reintenta con Push origin en GitHub Desktop." >&2
+fi
+exit 0

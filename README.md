@@ -57,3 +57,34 @@ Fuente: [FiveThirtyEight, datos de Bechdel](https://github.com/fivethirtyeight/d
 Licencia: [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/).
 La copia y el informe se identifican con el aviso:
 «Copia educativa: contiene modificaciones simuladas».
+
+## Envío automático después del commit
+
+El archivo `.githooks/post-commit` permite que un commit en `main` intente
+enviarse a `origin/main` automáticamente, también desde GitHub Desktop.
+Tras el envío, GitHub Actions ejecuta las pruebas y publica si todo pasa.
+El envío automático no ejecuta las pruebas localmente ni cambia esa condición.
+
+La activación es local a cada copia del repositorio. Para activarlo una vez,
+abrir **Repository → Open in Terminal** en GitHub Desktop y ejecutar:
+
+```console
+git config --local core.hooksPath .githooks
+```
+
+Después, escribir el mensaje y pulsar **Commit to main**. Hace falta conexión
+y autenticación de Git con permisos para enviar al repositorio. El envío se
+intenta durante la operación de commit; puede tardar unos segundos. Se envían
+también los commits anteriores de `main` que aún estén pendientes.
+
+Si el envío falla, el commit permanece guardado. El detalle está en
+`.git/auto-push.log` y se puede reintentar con **Push origin**. No se realizan
+envíos forzados ni se resuelven conflictos automáticamente. Otras ramas y el
+estado sin rama no activan el envío. La regla se aplica a cualquier herramienta
+que haga commits en esta copia, no solo a GitHub Desktop.
+
+Para desactivarlo y volver a pulsar **Push origin** manualmente:
+
+```console
+git config --local --unset core.hooksPath
+```
